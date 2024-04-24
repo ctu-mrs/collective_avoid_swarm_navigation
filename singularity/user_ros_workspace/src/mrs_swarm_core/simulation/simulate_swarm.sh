@@ -42,6 +42,7 @@ fi
 
 # init useful variables
 sim_resource_path=$(pwd)
+model_dir=$sim_resource_path'/../ros_packages/swarm_gazebo_resources/models'
 
 # #{ source bash files to use ros-bash commands
 source /opt/ros/noetic/setup.bash
@@ -166,11 +167,11 @@ fi
 # WINDOWS specific for each of the drones
 if [ "${odom_type}" == "gps" ]
 then
-  uav_windows=('status' 'swarm_controller' 'run_swarm_ctrl' 'goto' 'spawn' 'control' 'takeoff' 'bumper' 'shared_gps_aggr' 'global_origin_tf')
+  uav_windows=('status' 'swarm_controller' 'run_swarm_ctrl' 'goto' 'spawn' 'control' 'takeoff' 'bumper' 'path_finder' 'hector' 'hector_w_gps_tf' 'shared_gps_aggr' 'global_origin_tf')
 else
   if [ "${odom_type}" == "hector" ]
   then
-    uav_windows=('status' 'swarm_controller' 'run_swarm_ctrl' 'goto' 'path_finder' 'hector' 'spawn' 'control' 'takeoff' 'bumper' 'global_origin_tf' 'hector_w_gps_tf')
+    uav_windows=('status' 'swarm_controller' 'run_swarm_ctrl' 'goto' 'path_finder' 'hector' 'spawn' 'control' 'takeoff' 'bumper' 'global_origin_tf' 'hector_w_gps_tf' 'shared_gps_aggr')
   else
     echo Incorrect odometry type specified, exit; exit 1
   fi
@@ -187,11 +188,11 @@ window_commands['kill_session']='waitForRos; cd scripts; ./kill_session.sh $EPIS
 window_commands['slow_gz']='waitForRos; sleep 10; gz physics -u 125'
 
 window_commands['status']='waitForRos; roslaunch mrs_uav_status status.launch'
-window_commands['swarm_controller']='waitForControl; roslaunch swarm_control_manager swarm_control_manager.launch controller_pkg:='$swarm_controller' origin_frame:='$origin_frame' uav_frame:=fcu_untilted'
+window_commands['swarm_controller']='waitForControl; roslaunch swarm_control_manager swarm_control_manager.launch controller_pkg:='$swarm_controller' origin_frame:=hector_origin uav_frame:=fcu_untilted'
 window_commands['run_swarm_ctrl']='history -s rosservice call /$UAV_NAME/uav_manager/land;
 history -s rosservice call /$UAV_NAME/swarm_control_manager/activate_controller;
 history -s rosservice call /$UAV_NAME/swarm_control_manager/run_controller'
-window_commands['goto']='history -s rosservice call /$UAV_NAME/path_finder/path_goto'
+window_commands['goto']='history -s rosservice call /$UAV_NAME/pacnav_controller/goto'
 window_commands['path_finder']='waitForControl; roslaunch forest_path_finder path_finder.launch'
 window_commands['hector']='waitForSimulation; roslaunch mrs_uav_general hector_slam.launch map_size:=3000'
 window_commands['spawn']='waitForSimulation; sleep 2;
@@ -320,7 +321,7 @@ while [ $episodes != 0 ]; do
     echo 'episodes left: '$episodes
 
     # creating new world at the location
-    create_world='./create_world.py --world '$org_world_file' --new_world /tmp/swarm_custom.world --model /home/mrs/workspace/src/mrs_swarm_core/ros_packages/swarm_gazebo_resources/models/tree_simple/model.sdf --model_count '$obj_count' --cur_config '$sim_resource_path'/config/gazebo_config/init_uav_pose/'$exp_world'.yaml -w 50 -l 50 --thresh_dist 3.5 --uav_count '$uav_num''
+    create_world='./create_world.py --world '$org_world_file' --new_world /tmp/swarm_custom.world --model '$model_dir'/tree_simple/model.sdf --model_count '$obj_count' --cur_config '$sim_resource_path'/config/gazebo_config/init_uav_pose/'$exp_world'.yaml -w 50 -l 50 --thresh_dist 3.5 --uav_count '$uav_num''
     echo $(cd scripts && $create_world)
 
     # generate the tmux_config variable

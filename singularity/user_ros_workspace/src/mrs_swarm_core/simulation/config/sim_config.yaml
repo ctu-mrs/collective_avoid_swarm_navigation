@@ -7,10 +7,8 @@ exp_world: "grass_plane"
 odom_type: "gps"
 # swarm_controller: "test_controller"
 swarm_controller: "pacnav"
-# swarm_controller: "decap_planner"
-# swarm_controller: "icp_boids"
-# use_scheduler: true
-use_scheduler: false
+use_scheduler: true
+# use_scheduler: false
 
 # Only needed if use_scheuler is true
 obj_count: 104

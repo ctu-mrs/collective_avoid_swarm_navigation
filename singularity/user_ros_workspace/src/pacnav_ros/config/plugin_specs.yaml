@@ -3,7 +3,7 @@ PacnavController:
   ros_name_space: "pacnav"
 
   required_data:
-    self_data: ['laser_scan']
+    self_data: ['laser_scan', 'hector_map']
     neighbor_data: []
 
   neighbor_localization: 'shared_gps'
